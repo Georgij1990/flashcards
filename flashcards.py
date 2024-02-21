@@ -1,6 +1,8 @@
 print('Card:')
-card = input()
-print(card)
-print('Definition')
+term = input()
 definition = input()
-print(definition)
+answer = input()
+if answer == definition:
+    print('Your answer is right!')
+else:
+    print('Your answer is wrong...')

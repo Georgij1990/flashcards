@@ -1,3 +1,5 @@
+import random
+
 flashcards = {}
 
 
@@ -10,6 +12,7 @@ def add_flashcard():
         else:
             flashcards[term] = None
             break
+    print('The definition of the card:')
     while True:
         definition = input()
         if definition in flashcards.values():
@@ -17,6 +20,7 @@ def add_flashcard():
         else:
             flashcards[term] = definition
             break
+    print(f'The pair ("{term}":"{definition}") has been added.')
 
 
 def remove_flashcard():
@@ -30,6 +34,7 @@ def remove_flashcard():
 
 
 def import_flashcards():
+    counter = 0
     print('File name:')
     file_name = input()
     try:
@@ -39,9 +44,11 @@ def import_flashcards():
                 strip_line = line.strip()
                 term, definition = strip_line.split(':')
                 flashcards[term] = definition
+                counter += 1
         print(f'{counter} cards have been loaded.')
     except:
         print('File not found.')
+    print(f'{counter} cards have been loaded.')
 
 
 def export_flashcards():
@@ -54,10 +61,22 @@ def export_flashcards():
 
 
 def ask():
-    print('Input the number of cards:')
-    num_of_flashcards = int(input())
-    for i in range(num_of_flashcards):
-        add_flashcard()
+    print('How many times to ask?:')
+    number_of_ask = int(input())
+    for i in range(number_of_ask):
+        key_index = random.randint(0, len(flashcards) - 1)
+        key_list = list(flashcards.keys())
+        key = key_list[key_index]
+        value = flashcards[key]
+        print(f'Print the definition of  {key_list[key_index]}:')
+        definition = input()
+        if definition == value:
+            print('Correct')
+        elif definition != value and definition in flashcards.values():
+            print(
+                f'Wrong. The right answer is "{value}", but your definition is correct for "{[key for key in key_list if flashcards[key] == definition]}".')
+        else:
+            print(f'Wrong. The right answer is "{value}".')
 
 
 def control_flashcards():
@@ -79,36 +98,5 @@ def control_flashcards():
             break
 
 
-if __name__ == '__main__':
-    control_flashcards()
 
-# print('Input the number of cards:')
-# num_of_flashcards = int(input())
-
-# for i in range(num_of_flashcards):
-#     print(f'The term for card {i + 1}')
-#     term = None
-#     while True:
-#         term = input()
-#         if term in flashcards.keys():
-#             print(f'The term "{term}" already exists. Try again:')
-#         else:
-#             flashcards[term] = None
-#             break
-#     print(f'The definition for card {i + 1}:')
-#     while True:
-#         definition = input()
-#         if definition in flashcards.values():
-#             print(f'The definition "{definition}" already exists. Try again:')
-#         else:
-#             flashcards[term] = definition
-#             break
-# for k, v in flashcards.items():
-#     print(f'Print the definition of "{k}":')
-#     guess_definition = input()
-#     if flashcards[k] == guess_definition:
-#         print('Correct!')
-#     elif flashcards[k] != guess_definition and guess_definition in flashcards.values():
-#         print(f'Wrong. The right answer is "{v}", but your definition is correct for "{[key for key in flashcards.keys() if flashcards[k] == guess_definition]}".')
-#     else:
-#         print(f'Wrong. The right answer is "{v}".')
+control_flashcards()

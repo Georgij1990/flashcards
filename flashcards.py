@@ -1,88 +1,183 @@
 import random
 
 flashcards = {}
+hardest_cards = {}
+log_list = []
 
 
 def add_flashcard():
-    print('The card:')
+    msg = 'The card:'
+    log_list.append(msg)
+    print(msg)
     while True:
         term = input()
+        log_list.append(term)
         if term in flashcards.keys():
-            print(f'The term "{term}" already exists. Try again:')
+            msg = f'The term "{term}" already exists. Try again:'
+            log_list.append(msg)
+            print(msg)
         else:
             flashcards[term] = None
             break
-    print('The definition of the card:')
+    msg = 'The definition of the card:'
+    log_list.append(msg)
+    print(msg)
     while True:
         definition = input()
+        log_list.append(definition)
         if definition in flashcards.values():
-            print(f'The definition "{definition}" already exists. Try again:')
+            msg = f'The definition "{definition}" already exists. Try again:'
+            log_list.append(msg)
+            print(msg)
         else:
             flashcards[term] = definition
             break
-    print(f'The pair ("{term}":"{definition}") has been added.')
+    msg = f'The pair ("{term}":"{definition}") has been added.'
+    log_list.append(msg)
+    print(msg)
 
 
 def remove_flashcard():
-    print('Which card?')
+    msg = 'Which card?'
+    log_list.append(msg)
+    print(msg)
     card_to_remove = input()
+    log_list.append(card_to_remove)
     if card_to_remove in flashcards.keys():
         del flashcards[card_to_remove]
-        print('The card has been removed.')
+        msg = 'The card has been removed.'
+        log_list.append(msg)
+        print(msg)
     else:
-        print(f'Can\'t remove "{card_to_remove}": there is no such card.')
+        msg = f'Can\'t remove "{card_to_remove}": there is no such card.'
+        log_list.append(msg)
+        print(msg)
 
 
 def import_flashcards():
     counter = 0
-    print('File name:')
+    msg = 'File name:'
+    log_list.append(msg)
+    print(msg)
     file_name = input()
+    log_list.append(file_name)
     try:
         counter = 0
         with open(file_name, "r") as file1:
             for line in file1:
                 strip_line = line.strip()
-                term, definition = strip_line.split(':')
+                term, definition, errors = strip_line.split(':')
                 flashcards[term] = definition
+                hardest_cards[term] = int(errors)
                 counter += 1
-        print(f'{counter} cards have been loaded.')
+        msg = f'{counter} cards have been loaded.'
+        log_list.append(msg)
+        print(msg)
     except:
-        print('File not found.')
-    print(f'{counter} cards have been loaded.')
+        msg = 'File not found.'
+        log_list.append(msg)
+        print(msg)
+    msg = f'{counter} cards have been loaded.'
+    log_list.append(msg)
+    print(msg)
 
 
 def export_flashcards():
-    print('File name:')
+    msg = 'File name:'
+    log_list.append(msg)
+    print(msg)
     file_name = input()
+    log_list.append(file_name)
     with open(file_name, 'w') as file2:
         for (k, v) in flashcards.items():
-            file2.write(f'{k}:{v}\n')
-    print(f'{len(flashcards)} cards have been saved.')
+            if k not in hardest_cards.keys():
+                file2.write(f'{k}:{v}:0\n')
+            else:
+                file2.write(f'{k}:{v}:{hardest_cards[k]}\n')
+    msg = f'{len(flashcards)} cards have been saved.'
+    log_list.append(msg)
+    print(msg)
 
 
 def ask():
-    print('How many times to ask?:')
+    msg = 'How many times to ask?:'
+    log_list.append(msg)
+    print(msg)
     number_of_ask = int(input())
+    log_list.append(number_of_ask)
     for i in range(number_of_ask):
         key_index = random.randint(0, len(flashcards) - 1)
         key_list = list(flashcards.keys())
         key = key_list[key_index]
         value = flashcards[key]
-        print(f'Print the definition of  {key_list[key_index]}:')
+        msg = f'Print the definition of  {key_list[key_index]}:'
+        log_list.append(msg)
+        print(msg)
         definition = input()
+        log_list.append(definition)
         if definition == value:
-            print('Correct')
+            msg = 'Correct'
+            log_list.append(msg)
+            print(msg)
         elif definition != value and definition in flashcards.values():
-            print(
-                f'Wrong. The right answer is "{value}", but your definition is correct for "{[key for key in key_list if flashcards[key] == definition]}".')
+            msg = f'Wrong. The right answer is "{value}", but your definition is correct for "{[key for key in key_list if flashcards[key] == definition]}".'
+            log_list.append(msg)
+            print(msg)
+            if key not in hardest_cards.keys():
+                hardest_cards[key] = 1
+            else:
+                hardest_cards[key] += 1
         else:
-            print(f'Wrong. The right answer is "{value}".')
+            msg = f'Wrong. The right answer is "{value}".'
+            log_list.append(msg)
+            print(msg)
+            if key not in hardest_cards.keys():
+                hardest_cards[key] = 1
+            else:
+                hardest_cards[key] += 1
+
+
+def log():
+    msg = 'File name:'
+    log_list.append(msg)
+    print(msg)
+    file_name = input()
+    log_list.append(file_name)
+    with open(file_name, 'w') as file1:
+        for i in log_list:
+            print(i, file=file1)
+    print('The log has been saved.')
+
+
+def show_hardest_card():
+    sorted_hardest_cards = sorted(hardest_cards.items(), key=lambda x: x[1], reverse=True)
+    if len(sorted_hardest_cards) == 0:
+        print('There are no cards with errors.')
+    else:
+        hardest_cards_terms = return_cards(sorted_hardest_cards)
+        print(f'The hardest card are "{hardest_cards_terms}". You have {sorted_hardest_cards[0][1]} errors answering it.')
+
+
+def return_cards(sorted_dict):
+    highest_val = sorted_dict[0][1]
+    returned_list = []
+    for i in range(1, len(sorted_dict)):
+        if sorted_dict[i][1] == highest_val:
+            returned_list.append(sorted_dict[i][0])
+    return ', '.join(returned_list)
+
+
+def reset_stats():
+    for i in hardest_cards.keys():
+        hardest_cards[i] = 0
+    print('Card statistics have been reset.')
 
 
 def control_flashcards():
     while True:
-        print('Input the action (add, remove, import, export, ask, exit):')
+        print('Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):')
         action = input()
+        log_list.append(action)
         if action == 'add':
             add_flashcard()
         elif action == 'remove':
@@ -96,7 +191,12 @@ def control_flashcards():
         elif action == 'exit':
             print('Bye bye!')
             break
-
+        elif action == 'log':
+            log()
+        elif action == 'hardest card':
+            show_hardest_card()
+        elif action == 'reset_stats':
+            reset_stats()
 
 
 control_flashcards()

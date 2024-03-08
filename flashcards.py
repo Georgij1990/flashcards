@@ -155,22 +155,31 @@ def show_hardest_card():
         print('There are no cards with errors.')
     else:
         hardest_cards_terms = return_cards(sorted_hardest_cards)
-        print(f'The hardest card are "{hardest_cards_terms}". You have {sorted_hardest_cards[0][1]} errors answering it.')
+        arr = hardest_cards_terms.split(',')
+        if len(arr) == 1:
+            msg = f'The hardest card is "{hardest_cards_terms}". You have {sorted_hardest_cards[0][1]} errors answering it.'
+            log_list.append(msg)
+            print(msg)
+        else:
+            msg = f'The hardest card are "{hardest_cards_terms}". You have {sorted_hardest_cards[0][1]} errors answering them.'
+            log_list.append(msg)
+            print(msg)
 
 
 def return_cards(sorted_dict):
     highest_val = sorted_dict[0][1]
-    returned_list = []
+    returned_list = [sorted_dict[0][0]]
     for i in range(1, len(sorted_dict)):
         if sorted_dict[i][1] == highest_val:
             returned_list.append(sorted_dict[i][0])
-    return ', '.join(returned_list)
+    return '", "'.join(returned_list)
 
 
 def reset_stats():
-    for i in hardest_cards.keys():
-        hardest_cards[i] = 0
-    print('Card statistics have been reset.')
+    hardest_cards.clear()
+    msg = 'Card statistics have been reset.'
+    log_list.append(msg)
+    print(msg)
 
 
 def control_flashcards():
@@ -195,7 +204,7 @@ def control_flashcards():
             log()
         elif action == 'hardest card':
             show_hardest_card()
-        elif action == 'reset_stats':
+        elif action == 'reset stats':
             reset_stats()
 
 

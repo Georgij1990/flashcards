@@ -1,8 +1,25 @@
 import random
+import argparse
 
 flashcards = {}
 hardest_cards = {}
 log_list = []
+
+import_file = None
+export_file = None
+
+
+def take_arguments():
+    global import_file
+    global export_file
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--import_from')
+    parser.add_argument('--export_to')
+    args = parser.parse_args()
+    if args.import_from is not None:
+        import_file = args.import_from
+    if args.export_to is not None:
+        export_file = args.export_to
 
 
 def add_flashcard():
@@ -55,14 +72,17 @@ def remove_flashcard():
 
 
 def import_flashcards():
-    counter = 0
     msg = 'File name:'
     log_list.append(msg)
     print(msg)
     file_name = input()
     log_list.append(file_name)
+    import_to_file(file_name)
+
+
+def import_to_file(file_name):
+    counter = 0
     try:
-        counter = 0
         with open(file_name, "r") as file1:
             for line in file1:
                 strip_line = line.strip()
@@ -88,6 +108,10 @@ def export_flashcards():
     print(msg)
     file_name = input()
     log_list.append(file_name)
+    export(file_name)
+
+
+def export(file_name):
     with open(file_name, 'w') as file2:
         for (k, v) in flashcards.items():
             if k not in hardest_cards.keys():
@@ -97,6 +121,7 @@ def export_flashcards():
     msg = f'{len(flashcards)} cards have been saved.'
     log_list.append(msg)
     print(msg)
+    print('I\'m here')
 
 
 def ask():
@@ -183,6 +208,9 @@ def reset_stats():
 
 
 def control_flashcards():
+    take_arguments()
+    if import_file is not None:
+        import_to_file(import_file)
     while True:
         print('Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):')
         action = input()
@@ -199,6 +227,9 @@ def control_flashcards():
             ask()
         elif action == 'exit':
             print('Bye bye!')
+            print(export_file)
+            if export_file is not None:
+                export(export_file)
             break
         elif action == 'log':
             log()
